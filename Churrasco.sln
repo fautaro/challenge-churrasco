@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35222.181
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MVC", "MVC.csproj", "{F0447B3E-A7E5-4776-89A4-FFC78CDD7002}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MVC", "MVC\MVC.csproj", "{F0447B3E-A7E5-4776-89A4-FFC78CDD7002}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "..\Domain\Domain.csproj", "{BBB06A70-9E5D-4E0B-AA25-D15915A32059}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{BBB06A70-9E5D-4E0B-AA25-D15915A32059}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccess", "..\DataAccess\DataAccess.csproj", "{4B57FE5A-1025-4F23-9E8A-02324876D020}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccess", "DataAccess\DataAccess.csproj", "{4B57FE5A-1025-4F23-9E8A-02324876D020}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
