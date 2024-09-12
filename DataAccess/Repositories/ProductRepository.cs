@@ -1,4 +1,6 @@
 ﻿using DataAccess.Interfaces;
+using Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Repositories
 {
@@ -10,6 +12,27 @@ namespace DataAccess.Repositories
         {
             _context = context;
         }
+
+        public async Task<List<Products>> GetProductsList(int ProductsPerPage, int? pageSelected, CancellationToken cancellationToken)
+        {
+            var ProductsCount = await _context.Products.AsNoTracking().CountAsync(cancellationToken);
+            var PagesCount = (int)Math.Ceiling((double)ProductsCount / ProductsPerPage);
+
+            if (ProductsCount > 0)
+            {
+                var page = pageSelected ?? 1;
+                var skip = (page - 1) * ProductsPerPage;
+
+                return await _context.Products
+                    .AsNoTracking()
+                    .Skip(skip)
+                    .Take(ProductsPerPage)
+                    .ToListAsync(cancellationToken);
+            }
+
+            return new List<Products>();
+        }
+
 
     }
 }
