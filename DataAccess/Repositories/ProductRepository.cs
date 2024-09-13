@@ -1,4 +1,5 @@
 ﻿using DataAccess.Interfaces;
+using DataAccess.Models.ViewModels;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,11 +35,45 @@ namespace DataAccess.Repositories
         }
 
 
-        public async Task SaveProduct(Products product, CancellationToken cancellationToken)
+        public async Task SaveProduct(ProductViewModel request, CancellationToken cancellationToken)
         {
-            await _context.Products.AddAsync(product);
+            if (request.PictureList is not null)
+                await SaveImages(request.PictureList, cancellationToken);
+
+            //Todo: Migrar a automapper - o clase especial para mapeo manual
+            var product = new Products()
+            {
+                SKU = request.SKU,
+                Code = request.Code,
+                Name = request.Name,
+                Description = request.Description,
+                Price = request.Price,
+                Picture = request.PictureList != null ? request.PictureList.ImageFolder : string.Empty,
+                Currency = request.Currency
+
+            };
+
+            _context.Products.Add(product);
             await _context.SaveChangesAsync(cancellationToken);
         }
 
+        public async Task SaveImages(PictureListViewModel pictureList, CancellationToken cancellationToken)
+        {
+            foreach (var image in pictureList.Images)
+            {
+                var imageBytes = image.Item1;
+                var fileExtension = Path.GetExtension(image.Item2);
+
+                if (imageBytes.Length > 0)
+                {
+                    if (!Directory.Exists(pictureList.ImageFolder))
+                        Directory.CreateDirectory(pictureList.ImageFolder);
+
+                    var filePath = Path.Combine(pictureList.ImageFolder, $"{Guid.NewGuid()}{fileExtension}");
+
+                    await File.WriteAllBytesAsync(filePath, imageBytes, cancellationToken);
+                }
+            }
+        }
     }
 }
