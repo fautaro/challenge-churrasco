@@ -34,5 +34,11 @@ namespace DataAccess.Repositories
         }
 
 
+        public async Task SaveProduct(Products product, CancellationToken cancellationToken)
+        {
+            await _context.Products.AddAsync(product);
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+
     }
 }

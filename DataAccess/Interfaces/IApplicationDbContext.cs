@@ -7,6 +7,7 @@ namespace DataAccess.Interfaces
     {
         DbSet<User> Users { get; }
         DbSet<Products> Products { get; }
+        Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 
     }
 }
