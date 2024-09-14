@@ -4,9 +4,11 @@ using MVC.Models;
 using MVC.Services;
 using System.Diagnostics;
 using Churrasco.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Churrasco.Controllers
 {
+    [AllowAnonymous]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -14,10 +16,11 @@ namespace Churrasco.Controllers
         private readonly LoginService _loginService;
 
 
-        public HomeController(ILogger<HomeController> logger, IUserRepository repository)
+        public HomeController(ILogger<HomeController> logger, IUserRepository repository, LoginService loginService)
         {
             _logger = logger;
             _repository = repository;
+            _loginService = loginService;
         }
 
         public async Task<IActionResult> Index(CancellationToken cancellationToken)
@@ -38,10 +41,6 @@ namespace Churrasco.Controllers
             return loginResult;
         }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

@@ -10,12 +10,20 @@ builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetServic
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
+
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
         options.LoginPath = "/Home/Login";
-        options.AccessDeniedPath = "/Home/AccessDenied"; 
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+        options.SlidingExpiration = true;
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+#if DEBUG
+        options.Cookie.SecurePolicy = CookieSecurePolicy.None;
+#endif
     });
+
 
 builder.Services.AddAuthorization(options =>
 {
