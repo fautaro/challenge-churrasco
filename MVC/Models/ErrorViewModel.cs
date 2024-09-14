@@ -1,4 +1,4 @@
-namespace WebApplication1.Models
+namespace Churrasco.Models
 {
     public class ErrorViewModel
     {
