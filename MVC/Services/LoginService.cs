@@ -29,11 +29,12 @@ namespace MVC.Services
                 return response;
             }
 
+            await SignInAsync(user.Username, user.Role);
             response.Success = true;
             return response;
         }
 
-        public async Task SignInAsync(string Username, string Role)
+        private async Task SignInAsync(string Username, string Role)
         {
             var claims = new List<Claim>
             {
