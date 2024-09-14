@@ -9,19 +9,19 @@ namespace MVC.Services
     public class LoginService
     {
         private readonly IUserRepository _repository;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly HttpContext _httpContextAccessor;
 
 
         public LoginService(IUserRepository userRepository, IHttpContextAccessor httpContextAccessor)
         {
             _repository = userRepository;
-            _httpContextAccessor = httpContextAccessor;
+            _httpContextAccessor = httpContextAccessor.HttpContext;
         }
 
         public async Task<LoginViewModel> AuthenticateUser(string username, string password, CancellationToken cancellationToken)
         {
             LoginViewModel response = new LoginViewModel();
-            var user = _repository.GetUser(username, password, cancellationToken);
+            var user = await _repository.GetUser(username, password, cancellationToken);
 
             if (user == null)
             {
@@ -44,14 +44,14 @@ namespace MVC.Services
             var identity = new ClaimsIdentity(claims, "CookieAuthentication");
             var principal = new ClaimsPrincipal(identity);
 
-            await _httpContextAccessor.HttpContext.SignInAsync("CookieAuthentication", principal);
+            await _httpContextAccessor.SignInAsync("CookieAuthentication", principal);
 
         }
 
 
         public async Task SignOutAsync()
         {
-            await _httpContextAccessor.HttpContext.SignOutAsync("CookieAuthentication");
+            await _httpContextAccessor.SignOutAsync("CookieAuthentication");
         }
 
 
