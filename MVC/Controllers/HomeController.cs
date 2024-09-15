@@ -1,10 +1,10 @@
+using Churrasco.Models;
 using DataAccess.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MVC.Models;
 using MVC.Services;
 using System.Diagnostics;
-using Churrasco.Models;
-using Microsoft.AspNetCore.Authorization;
 
 namespace Churrasco.Controllers
 {
@@ -32,13 +32,14 @@ namespace Churrasco.Controllers
         [HttpPost]
         public async Task<LoginViewModel> Login(string username, string password, CancellationToken cancellationToken)
         {
+            LoginViewModel LoginResult = new LoginViewModel();
 
-            var loginResult = await _loginService.AuthenticateUser(username, password, cancellationToken);
+            LoginResult = await _loginService.AuthenticateUser(username, password, cancellationToken);
 
-            if (loginResult.Success)
+            if (LoginResult.Success)
                 RedirectToAction("Products", "Index");
 
-            return loginResult;
+            return LoginResult;
         }
 
 

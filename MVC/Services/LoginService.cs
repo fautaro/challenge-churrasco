@@ -1,5 +1,4 @@
 ﻿using DataAccess.Interfaces;
-using Domain.Entities;
 using Microsoft.AspNetCore.Authentication;
 using MVC.Models;
 using System.Security.Claims;
@@ -10,27 +9,43 @@ namespace MVC.Services
     {
         private readonly IUserRepository _repository;
         private readonly HttpContext _httpContextAccessor;
+        private readonly CryptoService _cryptoService;
 
 
-        public LoginService(IUserRepository userRepository, IHttpContextAccessor httpContextAccessor)
+        public LoginService(IUserRepository userRepository, IHttpContextAccessor httpContextAccessor, CryptoService cryptoService)
         {
             _repository = userRepository;
             _httpContextAccessor = httpContextAccessor.HttpContext;
+            _cryptoService = cryptoService;
         }
 
         public async Task<LoginViewModel> AuthenticateUser(string username, string password, CancellationToken cancellationToken)
         {
             LoginViewModel response = new LoginViewModel();
-            var user = await _repository.GetUser(username, password, cancellationToken);
-
-            if (user == null)
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
-                response.Message = "Los datos ingresados no son correctos.";
+                response.Message = "Todos los campos son requeridos.";
                 return response;
             }
+            try
+            {
+                var encriptedPassword = await _cryptoService.Encrypt(password);
 
-            await SignInAsync(user.Username, user.Role);
-            response.Success = true;
+                var user = await _repository.GetUser(username, encriptedPassword, cancellationToken);
+
+                if (user == null)
+                {
+                    response.Message = "Los datos ingresados no son correctos.";
+                    return response;
+                }
+
+                await SignInAsync(user.Username, user.Role);
+                response.Success = true;
+            }
+            catch (Exception ex)
+            {
+                response.Message = "Ocurrió un error al iniciar sesión.";
+            }
             return response;
         }
 
@@ -46,7 +61,6 @@ namespace MVC.Services
             var principal = new ClaimsPrincipal(identity);
 
             await _httpContextAccessor.SignInAsync("CookieAuthentication", principal);
-
         }
 
 
@@ -54,7 +68,5 @@ namespace MVC.Services
         {
             await _httpContextAccessor.SignOutAsync("CookieAuthentication");
         }
-
-
     }
 }
