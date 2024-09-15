@@ -11,9 +11,9 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetService<ApplicationDbContext>());
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<LoginService, LoginService>();
-builder.Services.AddScoped<CryptoService, CryptoService>();
-builder.Services.AddScoped<ProductService, ProductService>();
+builder.Services.AddScoped<LoginService>();
+builder.Services.AddScoped<ProductService>();
+builder.Services.AddTransient<CryptoService>();
 
 
 
