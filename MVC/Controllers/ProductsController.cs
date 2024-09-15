@@ -24,26 +24,27 @@ namespace MVC.Controllers
             _loginService = loginService;
             _webHostEnvironment = webHostEnvironment;
         }
+
+
         #region Get Products List
-        public async Task<IActionResult> Index(int page, CancellationToken cancellationToken)
+        [HttpGet]
+        public async Task<IActionResult> Index(int Page, int ProductsPerPage, CancellationToken cancellationToken)
         {
-            var ProductList = await GetPage(page, cancellationToken);
+            var ProductList = await GetPage(Page, ProductsPerPage, cancellationToken);
 
             return View(ProductList);
         }
 
 
-        private async Task<List<ProductViewModel>> GetPage(int page, CancellationToken cancellationToken)
+        private async Task<List<ProductViewModel>> GetPage(int page, int ProductsPerPage, CancellationToken cancellationToken)
         {
-            var productsPerPage = 5;
-            var ProductList = await _repository.GetProductsList(page, productsPerPage, cancellationToken);
+            var ProductList = await _repository.GetProductsList(page, ProductsPerPage, cancellationToken);
             List<ProductViewModel> result = new List<ProductViewModel>();
 
             foreach (var element in ProductList)
             {
                 ProductViewModel product = new ProductViewModel()
                 {
-                    Id = element.Id,
                     Name = element.Name,
                     Description = element.Description,
                     SKU = element.SKU,
@@ -90,7 +91,7 @@ namespace MVC.Controllers
 
         private async Task<PictureListDTO> TransformPicturesToArrayByte(IFormFileCollection images, CancellationToken cancellationToken)
         {
-            var imageList = new List<ImageDataDTO>();
+            var imageList = new List<PictureDTO>();
 
             using (var memoryStream = new MemoryStream())
             {
@@ -103,7 +104,7 @@ namespace MVC.Controllers
                         var imageBytes = memoryStream.ToArray();
                         var imageName = image.FileName;
 
-                        imageList.Add(new ImageDataDTO(imageBytes, imageName));
+                        imageList.Add(new PictureDTO(imageBytes, imageName));
                     }
                 }
             }

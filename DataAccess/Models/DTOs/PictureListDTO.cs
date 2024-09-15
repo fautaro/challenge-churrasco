@@ -5,8 +5,8 @@
         public string BaseImageFolder { get; set; }
         public string ImageGuid { get; set; }
         public string ImageFolder { get; set; }
-        public List<ImageDataDTO> Images { get; set; }
-        public PictureListDTO(List<ImageDataDTO> images)
+        public List<PictureDTO> Images { get; set; }
+        public PictureListDTO(List<PictureDTO> images)
         {
             BaseImageFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images");
             ImageGuid = Guid.NewGuid().ToString();
