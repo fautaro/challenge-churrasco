@@ -1,4 +1,5 @@
 ﻿using DataAccess.Interfaces;
+using DataAccess.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MVC.Services;
@@ -21,6 +22,12 @@ namespace MVC.Controllers
         }
 
         public async Task<IActionResult> Index(CancellationToken cancellationToken)
+        {
+            return View();
+        }
+
+
+        public async Task<IActionResult> AddProduct(ProductViewModel product, CancellationToken cancellationToken)
         {
             return View();
         }
