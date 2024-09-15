@@ -19,9 +19,9 @@ namespace MVC.Services
             _cryptoService = cryptoService;
         }
 
-        public async Task<Response<bool>> AuthenticateUser(string username, string password, CancellationToken cancellationToken)
+        public async Task<Response> AuthenticateUser(string username, string password, CancellationToken cancellationToken)
         {
-            var response = new Response<bool>()
+            var response = new Response()
             {
                 Success = false
             };

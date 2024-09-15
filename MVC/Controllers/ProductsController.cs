@@ -14,16 +14,26 @@ namespace MVC.Controllers
         private readonly ILogger<ProductsController> _logger;
         private readonly IProductRepository _repository;
         private readonly LoginService _loginService;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
 
-        public ProductsController(ILogger<ProductsController> logger, IProductRepository repository, LoginService loginService)
+        public ProductsController(ILogger<ProductsController> logger, IProductRepository repository, LoginService loginService, IWebHostEnvironment webHostEnvironment)
         {
             _logger = logger;
             _repository = repository;
             _loginService = loginService;
+            _webHostEnvironment = webHostEnvironment;
+        }
+        #region Get Products List
+        public async Task<IActionResult> Index(int page, CancellationToken cancellationToken)
+        {
+            var ProductList = await GetPage(page, cancellationToken);
+
+            return View(ProductList);
         }
 
-        public async Task<IActionResult> Index(int page, CancellationToken cancellationToken)
+
+        private async Task<List<ProductViewModel>> GetPage(int page, CancellationToken cancellationToken)
         {
             var productsPerPage = 5;
             var ProductList = await _repository.GetProductsList(page, productsPerPage, cancellationToken);
@@ -46,9 +56,12 @@ namespace MVC.Controllers
                 result.Add(product);
             }
 
-            return View(ProductList);
+            return result;
         }
 
+        #endregion
+
+        #region Add Products
         [HttpPost]
         public async Task<Response> AddProduct(ProductViewModel product, IFormFileCollection images, CancellationToken cancellationToken)
         {
@@ -61,7 +74,7 @@ namespace MVC.Controllers
             {
                 if (images != null && images.Count > 0)
                 {
-                    product.PictureList = await TransformPictures(images, cancellationToken);
+                    product.PictureList = await TransformPicturesToArrayByte(images, cancellationToken);
                 }
 
                 await _repository.SaveProduct(product, cancellationToken);
@@ -75,7 +88,7 @@ namespace MVC.Controllers
         }
 
 
-        private async Task<PictureListDTO> TransformPictures(IFormFileCollection images, CancellationToken cancellationToken)
+        private async Task<PictureListDTO> TransformPicturesToArrayByte(IFormFileCollection images, CancellationToken cancellationToken)
         {
             var imageList = new List<ImageDataDTO>();
 
@@ -117,10 +130,12 @@ namespace MVC.Controllers
 
         private string ConvertToUrl(string filePath)
         {
-            string baseUrl = ""; //TODO
+            string baseUrl = $"{_webHostEnvironment.WebRootPath}/images/products";
             string fileName = Path.GetFileName(filePath);
             return $"{baseUrl}{fileName}";
         }
+
+        #endregion
     }
 
 }
