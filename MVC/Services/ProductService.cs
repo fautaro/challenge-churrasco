@@ -41,7 +41,7 @@ namespace MVC.Services
                     Code = element.Code,
                     Currency = element.Currency,
                     Price = element.Price,
-                    UrlPictures = await GetImageUrls(element.Picture)
+                    UrlPictures = GetImageUrls(element.Picture)
                 };
 
                 result.Add(product);
@@ -50,7 +50,7 @@ namespace MVC.Services
             return result;
         }
 
-        private async Task<List<string>> GetImageUrls(string picturePath)
+        private List<string> GetImageUrls(string picturePath)
         {
             List<string> imageUrls = new List<string>();
 

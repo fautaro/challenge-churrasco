@@ -5,7 +5,7 @@ namespace MVC.Services
 {
     public class CryptoService
     {
-        public async Task<string> Encrypt(string input)
+        public string Encrypt(string input)
         {
             using (SHA256 sha256 = SHA256.Create())
             {

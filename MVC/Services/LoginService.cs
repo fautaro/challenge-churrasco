@@ -8,14 +8,14 @@ namespace MVC.Services
     public class LoginService
     {
         private readonly IUserRepository _repository;
-        private readonly HttpContext _httpContextAccessor;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly CryptoService _cryptoService;
 
 
         public LoginService(IUserRepository userRepository, IHttpContextAccessor httpContextAccessor, CryptoService cryptoService)
         {
             _repository = userRepository;
-            _httpContextAccessor = httpContextAccessor.HttpContext;
+            _httpContextAccessor = httpContextAccessor;
             _cryptoService = cryptoService;
         }
 
@@ -24,7 +24,7 @@ namespace MVC.Services
             var response = new Response() {Success = false };
             try
             {
-                var encriptedPassword = await _cryptoService.Encrypt(password);
+                var encriptedPassword = _cryptoService.Encrypt(password);
                 var user = await _repository.GetUser(username, encriptedPassword, cancellationToken);
 
                 if (user == null)
@@ -54,13 +54,13 @@ namespace MVC.Services
             var identity = new ClaimsIdentity(claims, "CookieAuthentication");
             var principal = new ClaimsPrincipal(identity);
 
-            await _httpContextAccessor.SignInAsync("CookieAuthentication", principal);
+            await _httpContextAccessor.HttpContext.SignInAsync("CookieAuthentication", principal);
         }
 
 
         public async Task SignOutAsync()
         {
-            await _httpContextAccessor.SignOutAsync("CookieAuthentication");
+            await _httpContextAccessor.HttpContext.SignOutAsync("CookieAuthentication");
         }
     }
 }
