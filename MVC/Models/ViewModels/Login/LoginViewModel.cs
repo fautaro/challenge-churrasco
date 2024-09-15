@@ -1,4 +1,4 @@
-﻿namespace MVC.Models.Login
+﻿namespace MVC.Models.ViewModels.Login
 {
     public class LoginViewModel
     {

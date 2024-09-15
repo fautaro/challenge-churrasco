@@ -1,6 +1,6 @@
 ﻿using DataAccess.Interfaces;
 using Microsoft.AspNetCore.Authentication;
-using MVC.Models.Login;
+using MVC.Models.ViewModels.Login;
 using System.Security.Claims;
 
 namespace MVC.Services
