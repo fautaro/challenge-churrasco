@@ -1,6 +1,6 @@
 ﻿using DataAccess.Interfaces;
 using Microsoft.AspNetCore.Authentication;
-using MVC.Models.ViewModels.Login;
+using MVC.Models;
 using System.Security.Claims;
 
 namespace MVC.Services
@@ -19,18 +19,22 @@ namespace MVC.Services
             _cryptoService = cryptoService;
         }
 
-        public async Task<LoginViewModel> AuthenticateUser(string username, string password, CancellationToken cancellationToken)
+        public async Task<Response<bool>> AuthenticateUser(string username, string password, CancellationToken cancellationToken)
         {
-            LoginViewModel response = new LoginViewModel();
+            var response = new Response<bool>()
+            {
+                Success = false
+            };
+
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
                 response.Message = "Todos los campos son requeridos.";
                 return response;
             }
+
             try
             {
                 var encriptedPassword = await _cryptoService.Encrypt(password);
-
                 var user = await _repository.GetUser(username, encriptedPassword, cancellationToken);
 
                 if (user == null)
@@ -41,6 +45,7 @@ namespace MVC.Services
 
                 await SignInAsync(user.Username, user.Role);
                 response.Success = true;
+                response.Message = "Inicio de sesión exitoso.";
             }
             catch (Exception ex)
             {

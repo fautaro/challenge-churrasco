@@ -61,17 +61,14 @@ namespace DataAccess.Repositories
         {
             foreach (var image in pictureList.Images)
             {
-                var imageBytes = image.Item1;
-                var fileExtension = Path.GetExtension(image.Item2);
-
-                if (imageBytes.Length > 0)
+                if (image.ImageBytes.Length > 0)
                 {
                     if (!Directory.Exists(pictureList.ImageFolder))
                         Directory.CreateDirectory(pictureList.ImageFolder);
 
-                    var filePath = Path.Combine(pictureList.ImageFolder, $"{Guid.NewGuid()}{fileExtension}");
+                    var filePath = Path.Combine(pictureList.ImageFolder, $"{Guid.NewGuid()}{Path.GetExtension(image.FileName)}");
 
-                    await File.WriteAllBytesAsync(filePath, imageBytes, cancellationToken);
+                    await File.WriteAllBytesAsync(filePath, image.ImageBytes, cancellationToken);
                 }
             }
         }
