@@ -1,11 +1,11 @@
-﻿using DataAccess.Models.ViewModels;
+﻿using DataAccess.Models;
 using Domain.Entities;
 
 namespace DataAccess.Interfaces
 {
     public interface IProductRepository
     {
-        Task<List<Products>> GetProductsList(int ProductsPerPage, int? pageSelected, CancellationToken cancellationToken);
+        Task<List<Products>> GetProductsList(int Page, int ProductsPerPage, CancellationToken cancellationToken);
         Task SaveProduct(ProductViewModel request, CancellationToken cancellationToken);
     }
 }

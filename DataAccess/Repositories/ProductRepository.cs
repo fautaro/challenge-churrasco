@@ -1,4 +1,5 @@
 ﻿using DataAccess.Interfaces;
+using DataAccess.Models;
 using DataAccess.Models.ViewModels;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -14,15 +15,14 @@ namespace DataAccess.Repositories
             _context = context;
         }
 
-        public async Task<List<Products>> GetProductsList(int ProductsPerPage, int? pageSelected, CancellationToken cancellationToken)
+        public async Task<List<Products>> GetProductsList(int Page, int ProductsPerPage, CancellationToken cancellationToken)
         {
             var ProductsCount = await _context.Products.AsNoTracking().CountAsync(cancellationToken);
             var PagesCount = (int)Math.Ceiling((double)ProductsCount / ProductsPerPage);
 
             if (ProductsCount > 0)
             {
-                var page = pageSelected ?? 1;
-                var skip = (page - 1) * ProductsPerPage;
+                var skip = (Page - 1) * ProductsPerPage;
 
                 return await _context.Products
                     .AsNoTracking()
@@ -57,21 +57,18 @@ namespace DataAccess.Repositories
             await _context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task SaveImages(PictureListViewModel pictureList, CancellationToken cancellationToken)
+        public async Task SaveImages(PictureListDTO pictureList, CancellationToken cancellationToken)
         {
             foreach (var image in pictureList.Images)
             {
-                var imageBytes = image.Item1;
-                var fileExtension = Path.GetExtension(image.Item2);
-
-                if (imageBytes.Length > 0)
+                if (image.ImageBytes.Length > 0)
                 {
                     if (!Directory.Exists(pictureList.ImageFolder))
                         Directory.CreateDirectory(pictureList.ImageFolder);
 
-                    var filePath = Path.Combine(pictureList.ImageFolder, $"{Guid.NewGuid()}{fileExtension}");
+                    var filePath = Path.Combine(pictureList.ImageFolder, $"{Guid.NewGuid()}{Path.GetExtension(image.FileName)}");
 
-                    await File.WriteAllBytesAsync(filePath, imageBytes, cancellationToken);
+                    await File.WriteAllBytesAsync(filePath, image.ImageBytes, cancellationToken);
                 }
             }
         }
