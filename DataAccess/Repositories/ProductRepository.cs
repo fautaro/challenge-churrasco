@@ -1,4 +1,5 @@
 ﻿using DataAccess.Interfaces;
+using DataAccess.Models;
 using DataAccess.Models.ViewModels;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -57,7 +58,7 @@ namespace DataAccess.Repositories
             await _context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task SaveImages(PictureListViewModel pictureList, CancellationToken cancellationToken)
+        public async Task SaveImages(PictureListDTO pictureList, CancellationToken cancellationToken)
         {
             foreach (var image in pictureList.Images)
             {

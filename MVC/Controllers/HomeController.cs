@@ -30,9 +30,9 @@ namespace Churrasco.Controllers
 
 
         [HttpPost]
-        public async Task<Response<bool>> Login(string username, string password, CancellationToken cancellationToken)
+        public async Task<Response> Login(string username, string password, CancellationToken cancellationToken)
         {
-            Response<bool> LoginResult = await _loginService.AuthenticateUser(username, password, cancellationToken);
+            Response LoginResult = await _loginService.AuthenticateUser(username, password, cancellationToken);
 
             if (LoginResult.Success)
                 RedirectToAction("Products", "Index");

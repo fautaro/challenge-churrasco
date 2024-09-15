@@ -1,18 +1,16 @@
 ﻿namespace MVC.Models
 {
-    public class Response<T>
+    public class Response
     {
         public bool Success { get; set; }
         public string Message { get; set; }
-        public T Data { get; set; }
 
         public Response() { }
 
-        public Response(bool success, string message, T data)
+        public Response(bool success, string message)
         {
             Success = success;
             Message = message;
-            Data = data;
         }
     }
 

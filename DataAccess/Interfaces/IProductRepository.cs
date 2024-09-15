@@ -1,4 +1,4 @@
-﻿using DataAccess.Models.ViewModels;
+﻿using DataAccess.Models;
 using Domain.Entities;
 
 namespace DataAccess.Interfaces

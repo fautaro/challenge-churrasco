@@ -1,4 +1,5 @@
 ﻿using DataAccess.Interfaces;
+using DataAccess.Models;
 using DataAccess.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,16 +23,36 @@ namespace MVC.Controllers
             _loginService = loginService;
         }
 
-        public async Task<IActionResult> Index(CancellationToken cancellationToken)
+        public async Task<IActionResult> Index(int page, CancellationToken cancellationToken)
         {
-            return View();
+            var productsPerPage = 5;
+            var ProductList = await _repository.GetProductsList(page, productsPerPage, cancellationToken);
+            List<ProductViewModel> result = new List<ProductViewModel>();
+
+            foreach (var element in ProductList)
+            {
+                ProductViewModel product = new ProductViewModel()
+                {
+                    Id = element.Id,
+                    Name = element.Name,
+                    Description = element.Description,
+                    SKU = element.SKU,
+                    Code = element.Code,
+                    Currency = element.Currency,
+                    Price = element.Price,
+                    UrlPictures = await GetImageUrls(element.Picture)
+                };
+
+                result.Add(product);
+            }
+
+            return View(ProductList);
         }
 
-
         [HttpPost]
-        public async Task<Response<bool>> AddProduct(ProductViewModel product, IFormFileCollection images, CancellationToken cancellationToken)
+        public async Task<Response> AddProduct(ProductViewModel product, IFormFileCollection images, CancellationToken cancellationToken)
         {
-            Response<bool> result = new Response<bool> { Success = false };
+            Response result = new Response{ Success = false };
 
             if (product == null)
                 throw new Exception("El producto no puede estar vacío");
@@ -40,11 +61,11 @@ namespace MVC.Controllers
             {
                 if (images != null && images.Count > 0)
                 {
-
                     product.PictureList = await TransformPictures(images, cancellationToken);
-                    await _repository.SaveProduct(product, cancellationToken);
-                    result.Success = true;
                 }
+
+                await _repository.SaveProduct(product, cancellationToken);
+                result.Success = true;
             }
             catch (Exception ex)
             {
@@ -54,9 +75,9 @@ namespace MVC.Controllers
         }
 
 
-        private async Task<PictureListViewModel> TransformPictures(IFormFileCollection images, CancellationToken cancellationToken)
+        private async Task<PictureListDTO> TransformPictures(IFormFileCollection images, CancellationToken cancellationToken)
         {
-            var imageList = new List<ImageData>();
+            var imageList = new List<ImageDataDTO>();
 
             using (var memoryStream = new MemoryStream())
             {
@@ -69,11 +90,36 @@ namespace MVC.Controllers
                         var imageBytes = memoryStream.ToArray();
                         var imageName = image.FileName;
 
-                        imageList.Add(new ImageData(imageBytes, imageName));
+                        imageList.Add(new ImageDataDTO(imageBytes, imageName));
                     }
                 }
             }
-            return new PictureListViewModel(imageList);
+            return new PictureListDTO(imageList);
+        }
+
+
+        private async Task<List<string>> GetImageUrls(string picturePath)
+        {
+            List<string> imageUrls = new List<string>();
+
+            if (Directory.Exists(picturePath))
+            {
+                var imageFiles = Directory.GetFiles(picturePath, "*.*", SearchOption.TopDirectoryOnly);
+
+                foreach (var file in imageFiles)
+                {
+                    string url = ConvertToUrl(file);
+                    imageUrls.Add(url);
+                }
+            }
+            return imageUrls;
+        }
+
+        private string ConvertToUrl(string filePath)
+        {
+            string baseUrl = ""; //TODO
+            string fileName = Path.GetFileName(filePath);
+            return $"{baseUrl}{fileName}";
         }
     }
 

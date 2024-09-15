@@ -1,4 +1,6 @@
-﻿namespace DataAccess.Models.ViewModels
+﻿using DataAccess.Models.ViewModels;
+
+namespace DataAccess.Models
 {
     public class ProductViewModel
     {
@@ -9,6 +11,7 @@
         public string Description { get; set; }
         public decimal Price { get; set; }
         public string Currency { get; set; }
-        public PictureListViewModel? PictureList { get; set; }
+        public PictureListDTO? PictureList { get; set; }
+        public List<string>? UrlPictures { get; set; }
     }
 }
