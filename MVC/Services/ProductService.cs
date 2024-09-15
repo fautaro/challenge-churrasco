@@ -35,12 +35,10 @@ namespace MVC.Services
             {
                 ProductViewModel product = new ProductViewModel()
                 {
-                    Name = element.Name,
-                    Description = element.Description,
                     SKU = element.SKU,
-                    Code = element.Code,
+                    Name = element.Name,
+                    Price = element.Price ?? 0,
                     Currency = element.Currency,
-                    Price = element.Price,
                     UrlPictures = GetImageUrls(element.Picture)
                 };
 

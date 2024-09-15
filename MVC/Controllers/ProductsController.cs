@@ -24,7 +24,7 @@ namespace MVC.Controllers
 
         #region Get Products List
         [HttpGet]
-        public async Task<IActionResult> Index(int Page, int ProductsPerPage, CancellationToken cancellationToken)
+        public async Task<IActionResult> Index(CancellationToken cancellationToken, int Page = 1, int ProductsPerPage = 5)
         {
             var ProductList = await _productService.GetProductsAsync(Page, ProductsPerPage, cancellationToken);
 

@@ -10,7 +10,9 @@ namespace DataAccess.Models
         public string Description { get; set; }
         public decimal Price { get; set; }
         public string Currency { get; set; }
-        public PictureListDTO? PictureList { get; set; }
+
         public List<string>? UrlPictures { get; set; }
+
+        public PictureListDTO? PictureList { get; set; }
     }
 }

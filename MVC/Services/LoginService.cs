@@ -1,5 +1,6 @@
 ﻿using DataAccess.Interfaces;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using MVC.Models;
 using System.Security.Claims;
 
@@ -33,7 +34,7 @@ namespace MVC.Services
                     return response;
                 }
 
-                await SignInAsync(user.Username, user.Role);
+                await SignInAsync(user.Username, user.Role.ToLower());
                 response.Success = true;
             }
             catch (Exception ex)
@@ -51,16 +52,16 @@ namespace MVC.Services
             new Claim(ClaimTypes.Role, Role)
             };
 
-            var identity = new ClaimsIdentity(claims, "CookieAuthentication");
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             var principal = new ClaimsPrincipal(identity);
 
-            await _httpContextAccessor.HttpContext.SignInAsync("CookieAuthentication", principal);
+            await _httpContextAccessor.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
         }
 
 
         public async Task SignOutAsync()
         {
-            await _httpContextAccessor.HttpContext.SignOutAsync("CookieAuthentication");
+            await _httpContextAccessor.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         }
     }
 }

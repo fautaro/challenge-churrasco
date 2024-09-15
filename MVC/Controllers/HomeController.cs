@@ -27,23 +27,24 @@ namespace Churrasco.Controllers
         }
 
         [HttpPost]
-        public async Task<Response> Login(string username, string password, CancellationToken cancellationToken)
+        public async Task<IActionResult> Login(string username, string password, CancellationToken cancellationToken)
         {
-            var response = new Response() { Success = false };
-
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
-                response.Message = "Todos los campos son requeridos.";
-                return response;
+                TempData["ErrorMessage"] = "Todos los campos son requeridos.";
+                return RedirectToAction("Index", "Home");
             }
 
-            response = await _loginService.AuthenticateUser(username, password, cancellationToken);
+            var response = await _loginService.AuthenticateUser(username, password, cancellationToken);
 
             if (response.Success)
-                RedirectToAction("Products", "Index");
+                return RedirectToAction("Index", "Products");
+            
 
-            return response;
+            TempData["ErrorMessage"] = response.Message;
+            return RedirectToAction("Index", "Home");
         }
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
