@@ -34,6 +34,14 @@ namespace MVC.Controllers
         #endregion
 
         #region Add Products
+
+        [HttpGet]
+        public IActionResult AddProduct(CancellationToken cancellationToken)
+        {
+            return View();
+        }
+
+
         [HttpPost]
         public async Task<Response> AddProduct(ProductViewModel product, IFormFileCollection images, CancellationToken cancellationToken)
         {
