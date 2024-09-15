@@ -1,6 +1,4 @@
-﻿using DataAccess.Interfaces;
-using DataAccess.Models;
-using DataAccess.Models.ViewModels;
+﻿using DataAccess.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MVC.Models;
@@ -45,7 +43,7 @@ namespace MVC.Controllers
         [HttpPost]
         public async Task<Response> AddProduct(ProductViewModel product, IFormFileCollection images, CancellationToken cancellationToken)
         {
-            Response result = new Response{ Success = false };
+            Response result = new Response { Success = false };
 
             if (product == null)
                 throw new Exception("El producto no puede estar vacío.");

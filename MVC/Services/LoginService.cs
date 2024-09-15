@@ -22,7 +22,7 @@ namespace MVC.Services
 
         public async Task<Response> AuthenticateUser(string username, string password, CancellationToken cancellationToken)
         {
-            var response = new Response() {Success = false };
+            var response = new Response() { Success = false };
             try
             {
                 var encriptedPassword = _cryptoService.Encrypt(password);

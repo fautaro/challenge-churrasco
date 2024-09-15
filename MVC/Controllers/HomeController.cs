@@ -1,8 +1,6 @@
 using Churrasco.Models;
-using DataAccess.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MVC.Models;
 using MVC.Services;
 using System.Diagnostics;
 
@@ -39,7 +37,7 @@ namespace Churrasco.Controllers
 
             if (response.Success)
                 return RedirectToAction("Index", "Products");
-            
+
 
             TempData["ErrorMessage"] = response.Message;
             return RedirectToAction("Index", "Home");

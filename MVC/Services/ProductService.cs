@@ -1,8 +1,6 @@
 ﻿using DataAccess.Interfaces;
 using DataAccess.Models;
 using DataAccess.Models.ViewModels;
-using Microsoft.AspNetCore.Hosting;
-using MVC.Models;
 
 namespace MVC.Services
 {
