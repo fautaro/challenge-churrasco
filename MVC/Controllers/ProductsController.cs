@@ -12,17 +12,13 @@ namespace MVC.Controllers
     public class ProductsController : Controller
     {
         private readonly ILogger<ProductsController> _logger;
-        private readonly IProductRepository _repository;
-        private readonly LoginService _loginService;
-        private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly ProductService _productService;
 
 
-        public ProductsController(ILogger<ProductsController> logger, IProductRepository repository, LoginService loginService, IWebHostEnvironment webHostEnvironment)
+        public ProductsController(ILogger<ProductsController> logger, ProductService productService)
         {
             _logger = logger;
-            _repository = repository;
-            _loginService = loginService;
-            _webHostEnvironment = webHostEnvironment;
+            _productService = productService;
         }
 
 
@@ -30,34 +26,9 @@ namespace MVC.Controllers
         [HttpGet]
         public async Task<IActionResult> Index(int Page, int ProductsPerPage, CancellationToken cancellationToken)
         {
-            var ProductList = await GetPage(Page, ProductsPerPage, cancellationToken);
+            var ProductList = await _productService.GetProductsAsync(Page, ProductsPerPage, cancellationToken);
 
             return View(ProductList);
-        }
-
-
-        private async Task<List<ProductViewModel>> GetPage(int page, int ProductsPerPage, CancellationToken cancellationToken)
-        {
-            var ProductList = await _repository.GetProductsList(page, ProductsPerPage, cancellationToken);
-            List<ProductViewModel> result = new List<ProductViewModel>();
-
-            foreach (var element in ProductList)
-            {
-                ProductViewModel product = new ProductViewModel()
-                {
-                    Name = element.Name,
-                    Description = element.Description,
-                    SKU = element.SKU,
-                    Code = element.Code,
-                    Currency = element.Currency,
-                    Price = element.Price,
-                    UrlPictures = await GetImageUrls(element.Picture)
-                };
-
-                result.Add(product);
-            }
-
-            return result;
         }
 
         #endregion
@@ -69,16 +40,10 @@ namespace MVC.Controllers
             Response result = new Response{ Success = false };
 
             if (product == null)
-                throw new Exception("El producto no puede estar vacío");
-
+                throw new Exception("El producto no puede estar vacío.");
             try
             {
-                if (images != null && images.Count > 0)
-                {
-                    product.PictureList = await TransformPicturesToArrayByte(images, cancellationToken);
-                }
-
-                await _repository.SaveProduct(product, cancellationToken);
+                await _productService.AddProductAsync(product, images, cancellationToken);
                 result.Success = true;
             }
             catch (Exception ex)
@@ -86,54 +51,6 @@ namespace MVC.Controllers
                 result.Message = $"Ocurrió un error al guardar el producto: {ex.Message}";
             }
             return result;
-        }
-
-
-        private async Task<PictureListDTO> TransformPicturesToArrayByte(IFormFileCollection images, CancellationToken cancellationToken)
-        {
-            var imageList = new List<PictureDTO>();
-
-            using (var memoryStream = new MemoryStream())
-            {
-                foreach (var image in images)
-                {
-                    if (image.Length > 0)
-                    {
-                        memoryStream.SetLength(0);
-                        await image.CopyToAsync(memoryStream, cancellationToken);
-                        var imageBytes = memoryStream.ToArray();
-                        var imageName = image.FileName;
-
-                        imageList.Add(new PictureDTO(imageBytes, imageName));
-                    }
-                }
-            }
-            return new PictureListDTO(imageList);
-        }
-
-
-        private async Task<List<string>> GetImageUrls(string picturePath)
-        {
-            List<string> imageUrls = new List<string>();
-
-            if (Directory.Exists(picturePath))
-            {
-                var imageFiles = Directory.GetFiles(picturePath, "*.*", SearchOption.TopDirectoryOnly);
-
-                foreach (var file in imageFiles)
-                {
-                    string url = ConvertToUrl(file);
-                    imageUrls.Add(url);
-                }
-            }
-            return imageUrls;
-        }
-
-        private string ConvertToUrl(string filePath)
-        {
-            string baseUrl = $"{_webHostEnvironment.WebRootPath}/images/products";
-            string fileName = Path.GetFileName(filePath);
-            return $"{baseUrl}{fileName}";
         }
 
         #endregion

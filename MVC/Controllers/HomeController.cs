@@ -12,14 +12,12 @@ namespace Churrasco.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly IUserRepository _repository;
         private readonly LoginService _loginService;
 
 
-        public HomeController(ILogger<HomeController> logger, IUserRepository repository, LoginService loginService)
+        public HomeController(ILogger<HomeController> logger, LoginService loginService)
         {
             _logger = logger;
-            _repository = repository;
             _loginService = loginService;
         }
 
@@ -28,16 +26,23 @@ namespace Churrasco.Controllers
             return View();
         }
 
-
         [HttpPost]
         public async Task<Response> Login(string username, string password, CancellationToken cancellationToken)
         {
-            Response LoginResult = await _loginService.AuthenticateUser(username, password, cancellationToken);
+            var response = new Response() { Success = false };
 
-            if (LoginResult.Success)
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            {
+                response.Message = "Todos los campos son requeridos.";
+                return response;
+            }
+
+            response = await _loginService.AuthenticateUser(username, password, cancellationToken);
+
+            if (response.Success)
                 RedirectToAction("Products", "Index");
 
-            return LoginResult;
+            return response;
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

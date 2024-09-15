@@ -21,17 +21,7 @@ namespace MVC.Services
 
         public async Task<Response> AuthenticateUser(string username, string password, CancellationToken cancellationToken)
         {
-            var response = new Response()
-            {
-                Success = false
-            };
-
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
-            {
-                response.Message = "Todos los campos son requeridos.";
-                return response;
-            }
-
+            var response = new Response() {Success = false };
             try
             {
                 var encriptedPassword = await _cryptoService.Encrypt(password);
@@ -45,7 +35,6 @@ namespace MVC.Services
 
                 await SignInAsync(user.Username, user.Role);
                 response.Success = true;
-                response.Message = "Inicio de sesión exitoso.";
             }
             catch (Exception ex)
             {
