@@ -54,22 +54,21 @@ namespace MVC.Controllers
 
 
         [HttpPost]
-        public async Task<Response> AddProduct(ProductViewModel product, IFormFileCollection images, CancellationToken cancellationToken)
+        public async Task<IActionResult> AddProduct(ProductViewModel product, IFormFileCollection images, CancellationToken cancellationToken)
         {
-            Response result = new Response { Success = false };
-
             if (product == null)
                 throw new Exception("El producto no puede estar vacío.");
             try
             {
                 await _productService.AddProductAsync(product, images, cancellationToken);
-                result.Success = true;
+                TempData["SuccessMessage"] = "Producto guardado correctamente";
             }
             catch (Exception ex)
             {
-                result.Message = $"Ocurrió un error al guardar el producto: {ex.Message}";
+                TempData["ErrorMessage"] = $"Ocurrió un error al guardar el producto: {ex.Message}";
             }
-            return result;
+            return RedirectToAction("Index");
+
         }
 
         #endregion

@@ -61,11 +61,10 @@ namespace DataAccess.Repositories
                 Name = request.Name,
                 Description = request.Description,
                 Price = request.Price,
-                Picture = request.PictureList != null ? request.PictureList.ImageFolder : string.Empty,
+                Picture = request.PictureList != null ? request.PictureList.RelativeImageFolder : string.Empty,
                 Currency = request.Currency
 
             };
-
             _context.Products.Add(product);
             await _context.SaveChangesAsync(cancellationToken);
         }
