@@ -2,9 +2,6 @@
 using DataAccess.Interfaces;
 using DataAccess.Models;
 using Domain.Entities;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
-using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace MVC.Services
 {

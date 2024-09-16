@@ -1,7 +1,6 @@
 ﻿using DataAccess.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MVC.Models;
 using MVC.Services;
 
 namespace MVC.Controllers

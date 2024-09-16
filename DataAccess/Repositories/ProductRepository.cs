@@ -1,9 +1,6 @@
 ﻿using DataAccess.Interfaces;
-using DataAccess.Models;
-using DataAccess.Models.ViewModels;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using System.Threading;
 
 namespace DataAccess.Repositories
 {
