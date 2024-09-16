@@ -8,6 +8,6 @@ namespace DataAccess.Interfaces
         Task<List<Products>> GetProductsList(int Page, int ProductsPerPage, int ProductCounts, CancellationToken cancellationToken);
         Task<int> GetTotalProductsAsync(CancellationToken cancellationToken);
         Task<Products> GetProductAsync(int Id, CancellationToken cancellationToken);
-        Task SaveProduct(ProductViewModel request, CancellationToken cancellationToken);
+        Task SaveProduct(Products request, CancellationToken cancellationToken);
     }
 }

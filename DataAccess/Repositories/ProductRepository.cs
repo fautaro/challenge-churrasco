@@ -15,7 +15,7 @@ namespace DataAccess.Repositories
         {
             _context = context;
         }
-
+        #region Get Products 
         public async Task<Products> GetProductAsync(int Id, CancellationToken cancellationToken)
         {
             var Product = await _context.Products
@@ -47,42 +47,17 @@ namespace DataAccess.Repositories
             return ProductsCount;
         }
 
+        #endregion
 
-        public async Task SaveProduct(ProductViewModel request, CancellationToken cancellationToken)
+        #region Save Products 
+
+        public async Task SaveProduct(Products product, CancellationToken cancellationToken)
         {
-            if (request.PictureList is not null)
-                await SaveImages(request.PictureList, cancellationToken);
-
-            //Todo: Migrar a automapper - o clase especial para mapeo manual
-            var product = new Products()
-            {
-                SKU = request.SKU,
-                Code = request.Code,
-                Name = request.Name,
-                Description = request.Description,
-                Price = request.Price,
-                Picture = request.PictureList != null ? request.PictureList.RelativeImageFolder : string.Empty,
-                Currency = request.Currency
-
-            };
             _context.Products.Add(product);
             await _context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task SaveImages(PictureListDTO pictureList, CancellationToken cancellationToken)
-        {
-            foreach (var image in pictureList.Images)
-            {
-                if (image.ImageBytes.Length > 0)
-                {
-                    if (!Directory.Exists(pictureList.ImageFolder))
-                        Directory.CreateDirectory(pictureList.ImageFolder);
+        #endregion
 
-                    var filePath = Path.Combine(pictureList.ImageFolder, $"{Guid.NewGuid()}{Path.GetExtension(image.FileName)}");
-
-                    await File.WriteAllBytesAsync(filePath, image.ImageBytes, cancellationToken);
-                }
-            }
-        }
     }
 }
