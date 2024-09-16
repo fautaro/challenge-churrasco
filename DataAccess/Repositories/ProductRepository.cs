@@ -16,6 +16,14 @@ namespace DataAccess.Repositories
             _context = context;
         }
 
+        public async Task<Products> GetProductAsync(int Id, CancellationToken cancellationToken)
+        {
+            var Product = await _context.Products
+                .Where(e => e.Id.Equals(Id))
+                .FirstOrDefaultAsync(cancellationToken);
+
+            return Product;
+        }
         public async Task<List<Products>> GetProductsList(int Page, int ProductsPerPage, int ProductsCount, CancellationToken cancellationToken)
         {
 

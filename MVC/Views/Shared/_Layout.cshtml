@@ -41,7 +41,10 @@
         </header>
 
     }
-
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
     <div class="container-fluid">
         <main role="main" class="pb-3">
             @RenderBody()
@@ -53,10 +56,7 @@
             web services under your control
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+
     <script>
     $(document).ready(function () {
         if (typeof errorMessage !== 'undefined' && errorMessage != null) {

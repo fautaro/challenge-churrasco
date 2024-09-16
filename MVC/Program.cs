@@ -2,6 +2,7 @@ using DataAccess.Interfaces;
 using DataAccess.Persistence;
 using DataAccess.Repositories;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
 using MVC.Services;
 
@@ -15,7 +16,10 @@ builder.Services.AddScoped<LoginService>();
 builder.Services.AddScoped<ProductService>();
 builder.Services.AddTransient<CryptoService>();
 
-
+builder.Services.Configure<RazorViewEngineOptions>(options =>
+{
+    options.ViewLocationFormats.Add("/Views/PartialViews/{0}.cshtml");
+});
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>

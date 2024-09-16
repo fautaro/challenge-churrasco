@@ -2,13 +2,9 @@
 
 @model IEnumerable<ProductViewModel>
 <title>Churrasco - Productos</title>
-@* Paginator settings *@
 
-@{
-    var currentPage = ViewBag.CurrentPage ?? 1;
-    var totalPages = ViewBag.TotalPages ?? 1;
-    var productsPerPage = ViewBag.ProductsPerPage ?? 4;
-}
+
+
 @* Header *@
 
 <div class="py-5 full-width-header">
@@ -19,57 +15,15 @@
         </div>
     </div>
 </div>
-
-<div class="mb-2 mt-2">
-    @* Product List *@
-    <section class="py-5">
-        <div class="container px-4 px-lg-5 mt-5">
-            <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
-
-                @foreach (var product in Model)
-                {
-                    <div class="col mb-5">
-                        <div class="card cardProduct h-100">
-                            <img class="card-img-top img-cover" src="@(product.UrlPictures.FirstOrDefault() ?? Url.Content("~/images/defaultimage.jpg"))" alt="@product.Name" />
-                            <div class="card-body p-4">
-                                <div class="text-center">
-                                    <h5 class="fw-bolder">@product.Name</h5>
-                                    <span>SKU: @product.SKU</span>
-                                </div>
-                                <p class="mt-3 text-center"><strong>@product.Price @product.Currency</strong></p>
-
-                            </div>
-                            <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                                <div class="text-center"><a class="btn btn-outline-dark mt-auto" data-bs-toggle="modal" data-bs-target="#productModal-@product.SKU">Ver producto</a></div>
-                            </div>
-                        </div>
-                    </div>
-                }
-            </div>
-
-            @* Paginator *@
-            <nav>
-                <ul class="pagination justify-content-center">
-                    <li class="page-item @(currentPage == 1 ? "disabled" : "")">
-                        <a class="page-link custom-paginator-link" href="@Url.Action("Index", new { Page = currentPage - 1, ProductsPerPage = productsPerPage })">
-                            <i class="fas fa-angle-left"></i> Anterior
-                        </a>
-                    </li>
-                    @for (int i = 1; i <= totalPages; i++)
-                    {
-                        <li class="page-item @(i == currentPage ? "active custom-paginator-active" : "")">
-                            <a class="page-link custom-paginator-link" href="@Url.Action("Index", new { Page = i, ProductsPerPage = productsPerPage })">@i</a>
-                        </li>
-                    }
-                    <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
-                        <a class="page-link custom-paginator-link" href="@Url.Action("Index", new { Page = currentPage + 1, ProductsPerPage = productsPerPage })">
-                            Siguiente <i class="fas fa-angle-right"></i>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-
-
-        </div>
-    </section>
+<div class="mt-4 text-center">
+    <a id="btnAgregarProducto" asp-action="AddProduct" asp-controller="Products" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Agregar nuevo producto
+    </a>
 </div>
+@* Product List *@
+@{
+    await Html.RenderPartialAsync("_productsPartial", Model);
+}
+
+@* Generic Modal -  Product details: Este div renderiza un modal con los detalles del producto *@
+<div id="modalContainer"></div>

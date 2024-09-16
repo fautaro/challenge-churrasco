@@ -25,13 +25,21 @@ namespace MVC.Controllers
         public async Task<IActionResult> Index(CancellationToken cancellationToken, int Page = 1, int ProductsPerPage = 4)
         {
             var productList = await _productService.GetProductsAsync(Page, ProductsPerPage, cancellationToken);
-            var totalProducts = await _productService.GetTotalProductsAsync(cancellationToken);
+            var totalProducts = await _productService.GetQuantityTotalProductsAsync(cancellationToken);
 
             ViewBag.CurrentPage = Page;
             ViewBag.ProductsPerPage = ProductsPerPage;
             ViewBag.TotalPages = (int)Math.Ceiling((double)totalProducts / ProductsPerPage);
 
             return View(productList);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetProduct(int Id, CancellationToken cancellationToken)
+        {
+            var Product = await _productService.GetProduct(Id, cancellationToken);
+
+            return PartialView("_ModalProductPartial", Product);
         }
 
         #endregion

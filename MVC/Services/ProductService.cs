@@ -22,7 +22,7 @@ namespace MVC.Services
 
         public async Task<List<ProductViewModel>> GetProductsAsync(int Page, int ProductsPerPage, CancellationToken cancellationToken)
         {
-            var TotalProducts = await GetTotalProductsAsync(cancellationToken);
+            var TotalProducts = await GetQuantityTotalProductsAsync(cancellationToken);
             var ProductList = await _repository.GetProductsList(Page, ProductsPerPage, TotalProducts, cancellationToken);
 
             List<ProductViewModel> result = new List<ProductViewModel>();
@@ -31,6 +31,7 @@ namespace MVC.Services
             {
                 ProductViewModel product = new ProductViewModel()
                 {
+                    Id = element.Id,
                     SKU = element.SKU,
                     Name = element.Name,
                     Price = element.Price ?? 0,
@@ -43,10 +44,29 @@ namespace MVC.Services
 
             return result;
         }
-        public async Task<int> GetTotalProductsAsync(CancellationToken cancellationToken)
+        public async Task<int> GetQuantityTotalProductsAsync(CancellationToken cancellationToken)
         {
             var TotalProducts = await _repository.GetTotalProductsAsync(cancellationToken);
             return TotalProducts;
+        }
+
+
+        public async Task<ProductViewModel> GetProduct(int Id, CancellationToken cancellationToken)
+        {
+            var Product = await _repository.GetProductAsync(Id, cancellationToken);
+
+                ProductViewModel result = new ProductViewModel()
+                {
+                    Id = Product.Id,
+                    Description = Product.Description ?? "El producto no tiene descripción.",
+                    SKU = Product.SKU,
+                    Name = Product.Name,
+                    Price = Product.Price ?? 0,
+                    Currency = Product.Currency,
+                    UrlPictures = GetImageUrls(Product.Picture)
+                };
+
+            return result;
         }
 
         private List<string> GetImageUrls(string picturePath)
