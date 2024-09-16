@@ -1,8 +1,39 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    var errorMessage = TempData["ErrorMessage"] as string;
+}
+<title>Churrasco - Login</title>
+<link rel="stylesheet" href="~/css/login.css" asp-append-version="true" />
+@* Login form *@
+<div class="login-container">
+    <form asp-action="Login" method="post">
+        <img src="~/images/LOGO1.png" alt="Logo" class="churrascoLogo">
+        <input type="text" class="form-control mb-2" placeholder="Usuario o Email" id="username" name="username" required>
+        <input type="password" class="form-control" placeholder="Contraseña" id="password" name="password" required>
+        <button type="submit" class="btn btn-secondary mt-2">Login</button>
+    </form>
+</div>
+
+@* Modal - Con mensaje de error del controller*@
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="errorModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="errorModalLabel">Error al iniciar sesión</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">x</button>
+                </div>
+                <div class="modal-body">
+                    @errorMessage
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<script>
+    var errorMessage = '@errorMessage';
+</script>

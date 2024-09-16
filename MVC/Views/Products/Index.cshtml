@@ -1,0 +1,44 @@
+﻿@using DataAccess.Models
+
+@model IEnumerable<ProductViewModel>
+<title>Churrasco - Productos</title>
+
+@* Header *@
+<div class="py-5 full-width-header">
+    <div class="px-4 px-lg-5 my-5">
+        <div class="text-center">
+            <h1 class="display-4 fw-bolder titleProductsHeader">Catálogo de productos</h1>
+            <p class="lead fw-normal mb-0 subtitleProductsHeader">¡Bienvenido a nuestra tienda online! Disfruta de todo nuestro catálogo vigente.</p>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4 text-center">
+    <a id="btnAgregarProducto" asp-action="AddProduct" asp-controller="Products" class="btn btn-dark">
+        <i class="fas fa-plus"></i> Agregar nuevo producto
+    </a>
+
+</div>
+@* Product List *@
+@{
+    await Html.RenderPartialAsync("_productsPartial", Model);
+}
+
+@* Generic Modal -  Product details: Este div renderiza un modal con los detalles del producto *@
+<div id="modalContainer"></div>
+@{
+    var errorMessage = TempData["ErrorMessage"] as string;
+    var successMessage = TempData["SuccessMessage"] as string;
+}
+<script>
+    var errorMessage = '@errorMessage';
+    var successMessage = '@successMessage';
+    toastr.options = {"positionClass": "toast-bottom-right"};
+
+    if (typeof errorMessage !== 'undefined' && errorMessage != null && errorMessage != '') {
+        toastr.error(errorMessage)
+        }
+    if (typeof successMessage !== 'undefined' && successMessage != null && successMessage != '') {
+            toastr.success(successMessage)
+        }
+</script>

@@ -1,8 +1,6 @@
 using Churrasco.Models;
-using DataAccess.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MVC.Models;
 using MVC.Services;
 using System.Diagnostics;
 
@@ -23,7 +21,12 @@ namespace Churrasco.Controllers
 
         public IActionResult Index()
         {
+            //Todo: Corregir para que sea general
+            if (User.Identity.IsAuthenticated)
+                return RedirectToAction("Index", "Products");
+
             return View();
+
         }
 
         [HttpPost]
@@ -39,17 +42,18 @@ namespace Churrasco.Controllers
 
             if (response.Success)
                 return RedirectToAction("Index", "Products");
-            
+
 
             TempData["ErrorMessage"] = response.Message;
             return RedirectToAction("Index", "Home");
         }
 
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        public async Task<IActionResult> Logout(CancellationToken cancellationToken)
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            await _loginService.SignOutAsync(cancellationToken);
+            return RedirectToAction("Index", "Home");
+
         }
     }
 }

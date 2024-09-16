@@ -1,11 +1,16 @@
+using AutoMapper;
 using DataAccess.Interfaces;
 using DataAccess.Persistence;
+using DataAccess.Profiles;
 using DataAccess.Repositories;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
 using MVC.Services;
 
+
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddAutoMapper(typeof(ProductProfile));
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetService<ApplicationDbContext>());
@@ -15,7 +20,15 @@ builder.Services.AddScoped<LoginService>();
 builder.Services.AddScoped<ProductService>();
 builder.Services.AddTransient<CryptoService>();
 
+var mapperConfig = new MapperConfiguration(cfg =>
+{
+    cfg.AddProfile(new ProductProfile());
+});
 
+builder.Services.Configure<RazorViewEngineOptions>(options =>
+{
+    options.ViewLocationFormats.Add("/Views/PartialViews/{0}.cshtml");
+});
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -28,6 +41,19 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 #if DEBUG
         options.Cookie.SecurePolicy = CookieSecurePolicy.None;
 #endif
+
+        options.Events = new CookieAuthenticationEvents
+        {
+            OnRedirectToLogin = context =>
+            {
+                if (context.HttpContext.User.Identity.IsAuthenticated)
+                    context.Response.Redirect("/Products");
+                else
+                    context.Response.Redirect(context.RedirectUri);
+
+                return Task.CompletedTask;
+            }
+        };
     });
 
 
@@ -36,7 +62,7 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
 });
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),

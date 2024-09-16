@@ -1,9 +1,6 @@
-﻿using DataAccess.Interfaces;
-using DataAccess.Models;
-using DataAccess.Models.ViewModels;
+﻿using DataAccess.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MVC.Models;
 using MVC.Services;
 
 namespace MVC.Controllers
@@ -24,11 +21,24 @@ namespace MVC.Controllers
 
         #region Get Products List
         [HttpGet]
-        public async Task<IActionResult> Index(CancellationToken cancellationToken, int Page = 1, int ProductsPerPage = 5)
+        public async Task<IActionResult> Index(CancellationToken cancellationToken, int Page = 1, int ProductsPerPage = 4)
         {
-            var ProductList = await _productService.GetProductsAsync(Page, ProductsPerPage, cancellationToken);
+            var productList = await _productService.GetProductsAsync(Page, ProductsPerPage, cancellationToken);
+            var totalProducts = await _productService.GetQuantityTotalProductsAsync(cancellationToken);
 
-            return View(ProductList);
+            ViewBag.CurrentPage = Page;
+            ViewBag.ProductsPerPage = ProductsPerPage;
+            ViewBag.TotalPages = (int)Math.Ceiling((double)totalProducts / ProductsPerPage);
+
+            return View(productList);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetProduct(int Id, CancellationToken cancellationToken)
+        {
+            var Product = await _productService.GetProduct(Id, cancellationToken);
+
+            return PartialView("_ModalProductPartial", Product);
         }
 
         #endregion
@@ -43,22 +53,21 @@ namespace MVC.Controllers
 
 
         [HttpPost]
-        public async Task<Response> AddProduct(ProductViewModel product, IFormFileCollection images, CancellationToken cancellationToken)
+        public async Task<IActionResult> AddProduct(ProductViewModel product, IFormFileCollection images, CancellationToken cancellationToken)
         {
-            Response result = new Response{ Success = false };
-
             if (product == null)
                 throw new Exception("El producto no puede estar vacío.");
             try
             {
                 await _productService.AddProductAsync(product, images, cancellationToken);
-                result.Success = true;
+                TempData["SuccessMessage"] = "Producto guardado correctamente";
             }
             catch (Exception ex)
             {
-                result.Message = $"Ocurrió un error al guardar el producto: {ex.Message}";
+                TempData["ErrorMessage"] = $"Ocurrió un error al guardar el producto: {ex.Message}";
             }
-            return result;
+            return RedirectToAction("Index");
+
         }
 
         #endregion

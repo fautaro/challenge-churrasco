@@ -1,8 +1,7 @@
-﻿using DataAccess.Interfaces;
+﻿using AutoMapper;
+using DataAccess.Interfaces;
 using DataAccess.Models;
-using DataAccess.Models.ViewModels;
-using Microsoft.AspNetCore.Hosting;
-using MVC.Models;
+using Domain.Entities;
 
 namespace MVC.Services
 {
@@ -11,39 +10,45 @@ namespace MVC.Services
     {
         private readonly IProductRepository _repository;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IMapper _mapper;
 
-        public ProductService(IProductRepository productRepository, IWebHostEnvironment webHostEnvironment)
+
+        public ProductService(IProductRepository productRepository, IWebHostEnvironment webHostEnvironment, IMapper mapper)
         {
             _repository = productRepository;
             _webHostEnvironment = webHostEnvironment;
+            _mapper = mapper;
         }
 
         #region Get Products List
 
         public async Task<List<ProductViewModel>> GetProductsAsync(int Page, int ProductsPerPage, CancellationToken cancellationToken)
         {
-            var productList = await GetProductsPageSelected(Page, ProductsPerPage, cancellationToken);
-            return productList;
+            var TotalProducts = await GetQuantityTotalProductsAsync(cancellationToken);
+            var ProductList = await _repository.GetProductsList(Page, ProductsPerPage, TotalProducts, cancellationToken);
+
+            var result = _mapper.Map<List<ProductViewModel>>(ProductList);
+
+            foreach (var item in result)
+            {
+                item.UrlPictures = GetImageUrls(item.BaseFolderImages);
+            }
+
+            return result;
+        }
+        public async Task<int> GetQuantityTotalProductsAsync(CancellationToken cancellationToken)
+        {
+            var TotalProducts = await _repository.GetTotalProductsAsync(cancellationToken);
+            return TotalProducts;
         }
 
-        private async Task<List<ProductViewModel>> GetProductsPageSelected(int page, int ProductsPerPage, CancellationToken cancellationToken)
+
+        public async Task<ProductViewModel> GetProduct(int Id, CancellationToken cancellationToken)
         {
-            var ProductList = await _repository.GetProductsList(page, ProductsPerPage, cancellationToken);
-            List<ProductViewModel> result = new List<ProductViewModel>();
+            var Product = await _repository.GetProductAsync(Id, cancellationToken);
 
-            foreach (var element in ProductList)
-            {
-                ProductViewModel product = new ProductViewModel()
-                {
-                    SKU = element.SKU,
-                    Name = element.Name,
-                    Price = element.Price ?? 0,
-                    Currency = element.Currency,
-                    UrlPictures = GetImageUrls(element.Picture)
-                };
-
-                result.Add(product);
-            }
+            var result = _mapper.Map<ProductViewModel>(Product);
+            result.UrlPictures = GetImageUrls(result.BaseFolderImages);
 
             return result;
         }
@@ -52,62 +57,68 @@ namespace MVC.Services
         {
             List<string> imageUrls = new List<string>();
 
-            if (Directory.Exists(picturePath))
+            string wwwrootPath = _webHostEnvironment.WebRootPath;
+            string replaceRelativeSymbol = picturePath.TrimStart('~', '/');
+            string fullPath = Path.Combine(wwwrootPath, replaceRelativeSymbol);
+
+
+            if (Directory.Exists(fullPath))
             {
-                var imageFiles = Directory.GetFiles(picturePath, "*.*", SearchOption.TopDirectoryOnly);
+                var imageFiles = Directory.GetFiles(fullPath, "*.*", SearchOption.TopDirectoryOnly);
 
                 foreach (var file in imageFiles)
                 {
-                    string url = ConvertToUrl(file);
-                    imageUrls.Add(url);
+                    string fileName = Path.GetFileName(file);
+                    imageUrls.Add($"/{replaceRelativeSymbol}/{fileName}".Replace("//", "/"));
                 }
             }
+            else if (Uri.IsWellFormedUriString(picturePath, UriKind.Absolute) && (picturePath.StartsWith("http://") || picturePath.StartsWith("https://")))
+            {
+                imageUrls.Add(picturePath);
+            }
             return imageUrls;
-        }
-
-        private string ConvertToUrl(string filePath)
-        {
-            string baseUrl = $"{_webHostEnvironment.WebRootPath}/images/products";
-            string fileName = Path.GetFileName(filePath);
-            return $"{baseUrl}{fileName}";
         }
 
         #endregion
 
         #region Add Products
 
-        public async Task AddProductAsync(ProductViewModel product, IFormFileCollection images, CancellationToken cancellationToken)
+        public async Task AddProductAsync(ProductViewModel request, IFormFileCollection images, CancellationToken cancellationToken)
         {
-            if (images != null && images.Count > 0)
-            {
-                product.PictureList = await TransformPicturesToArrayByte(images, cancellationToken);
-            }
+
+            if (images.Count > 0)
+                request.BaseFolderImages = await MoveImagesToServer(images, cancellationToken);
+
+            var product = _mapper.Map<Products>(request);
 
             await _repository.SaveProduct(product, cancellationToken);
         }
 
-        private async Task<PictureListDTO> TransformPicturesToArrayByte(IFormFileCollection images, CancellationToken cancellationToken)
+        public async Task<string> MoveImagesToServer(IFormFileCollection images, CancellationToken cancellationToken)
         {
-            var imageList = new List<PictureDTO>();
+            var BaseImageFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "products");
+            var GuidPicturesFolder = Guid.NewGuid().ToString();
+            var ImageFolder = Path.Combine(BaseImageFolder, GuidPicturesFolder);
+            var relativeUrl = $"~//images//products//{GuidPicturesFolder}";
 
-            using (var memoryStream = new MemoryStream())
+            if (!Directory.Exists(ImageFolder))
+                Directory.CreateDirectory(ImageFolder);
+
+            foreach (var image in images)
             {
-                foreach (var image in images)
+                if (image.Length > 0)
                 {
-                    if (image.Length > 0)
-                    {
-                        memoryStream.SetLength(0);
-                        await image.CopyToAsync(memoryStream, cancellationToken);
-                        var imageBytes = memoryStream.ToArray();
-                        var imageName = image.FileName;
+                    var filePath = Path.Combine(ImageFolder, $"{Guid.NewGuid()}{Path.GetExtension(image.FileName)}");
 
-                        imageList.Add(new PictureDTO(imageBytes, imageName));
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await image.CopyToAsync(fileStream, cancellationToken);
                     }
                 }
             }
-            return new PictureListDTO(imageList);
-        }
 
+            return relativeUrl;
+        }
         #endregion
     }
 }
