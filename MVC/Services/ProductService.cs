@@ -1,6 +1,7 @@
 ﻿using DataAccess.Interfaces;
 using DataAccess.Models;
 using DataAccess.Models.ViewModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace MVC.Services
 {
@@ -26,7 +27,8 @@ namespace MVC.Services
 
         private async Task<List<ProductViewModel>> GetProductsPageSelected(int page, int ProductsPerPage, CancellationToken cancellationToken)
         {
-            var ProductList = await _repository.GetProductsList(page, ProductsPerPage, cancellationToken);
+            var TotalProducts = await GetTotalProductsAsync(cancellationToken);
+            var ProductList = await _repository.GetProductsList(page, ProductsPerPage, TotalProducts, cancellationToken);
             List<ProductViewModel> result = new List<ProductViewModel>();
 
             foreach (var element in ProductList)
@@ -44,6 +46,11 @@ namespace MVC.Services
             }
 
             return result;
+        }
+        public async Task<int> GetTotalProductsAsync(CancellationToken cancellationToken)
+        {
+            var TotalProducts = await _repository.GetTotalProductsAsync(cancellationToken);
+            return TotalProducts;
         }
 
         private List<string> GetImageUrls(string picturePath)

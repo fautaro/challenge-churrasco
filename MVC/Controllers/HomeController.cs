@@ -21,7 +21,12 @@ namespace Churrasco.Controllers
 
         public IActionResult Index()
         {
+            //Todo: Corregir para que sea general
+            if (User.Identity.IsAuthenticated)
+                return RedirectToAction("Index", "Products");
+
             return View();
+
         }
 
         [HttpPost]
@@ -43,6 +48,13 @@ namespace Churrasco.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+
+        public async Task<IActionResult> Logout(CancellationToken cancellationToken)
+        {
+            await _loginService.SignOutAsync(cancellationToken);
+            return RedirectToAction("Index", "Home");
+
+        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

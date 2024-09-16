@@ -3,6 +3,7 @@ using DataAccess.Models;
 using DataAccess.Models.ViewModels;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Threading;
 
 namespace DataAccess.Repositories
 {
@@ -15,10 +16,8 @@ namespace DataAccess.Repositories
             _context = context;
         }
 
-        public async Task<List<Products>> GetProductsList(int Page, int ProductsPerPage, CancellationToken cancellationToken)
+        public async Task<List<Products>> GetProductsList(int Page, int ProductsPerPage, int ProductsCount, CancellationToken cancellationToken)
         {
-            var ProductsCount = await _context.Products.AsNoTracking().CountAsync(cancellationToken);
-            var PagesCount = (int)Math.Ceiling((double)ProductsCount / ProductsPerPage);
 
             if (ProductsCount > 0)
             {
@@ -32,6 +31,12 @@ namespace DataAccess.Repositories
             }
 
             return new List<Products>();
+        }
+
+        public async Task<int> GetTotalProductsAsync(CancellationToken cancellationToken)
+        {
+            var ProductsCount = await _context.Products.AsNoTracking().CountAsync(cancellationToken);
+            return ProductsCount;
         }
 
 

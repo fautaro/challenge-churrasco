@@ -59,7 +59,7 @@ namespace MVC.Services
         }
 
 
-        public async Task SignOutAsync()
+        public async Task SignOutAsync(CancellationToken cancellationToken)
         {
             await _httpContextAccessor.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         }

@@ -22,11 +22,16 @@ namespace MVC.Controllers
 
         #region Get Products List
         [HttpGet]
-        public async Task<IActionResult> Index(CancellationToken cancellationToken, int Page = 1, int ProductsPerPage = 5)
+        public async Task<IActionResult> Index(CancellationToken cancellationToken, int Page = 1, int ProductsPerPage = 4)
         {
-            var ProductList = await _productService.GetProductsAsync(Page, ProductsPerPage, cancellationToken);
+            var productList = await _productService.GetProductsAsync(Page, ProductsPerPage, cancellationToken);
+            var totalProducts = await _productService.GetTotalProductsAsync(cancellationToken);
 
-            return View(ProductList);
+            ViewBag.CurrentPage = Page;
+            ViewBag.ProductsPerPage = ProductsPerPage;
+            ViewBag.TotalPages = (int)Math.Ceiling((double)totalProducts / ProductsPerPage);
+
+            return View(productList);
         }
 
         #endregion

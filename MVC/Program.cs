@@ -28,6 +28,19 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 #if DEBUG
         options.Cookie.SecurePolicy = CookieSecurePolicy.None;
 #endif
+
+        options.Events = new CookieAuthenticationEvents
+        {
+            OnRedirectToLogin = context =>
+            {
+                if (context.HttpContext.User.Identity.IsAuthenticated)
+                    context.Response.Redirect("/Products");
+                else
+                    context.Response.Redirect(context.RedirectUri);
+
+                return Task.CompletedTask;
+            }
+        };
     });
 
 

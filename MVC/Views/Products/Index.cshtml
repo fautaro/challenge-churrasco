@@ -1,0 +1,69 @@
+﻿@using DataAccess.Models
+
+@model IEnumerable<ProductViewModel>
+<title>Churrasco - Productos</title>
+
+@{
+    var currentPage = ViewBag.CurrentPage ?? 1;
+    var totalPages = ViewBag.TotalPages ?? 1;
+    var productsPerPage = ViewBag.ProductsPerPage ?? 4;
+}
+@* Header *@
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body d-flex justify-content-between align-items-center p-3">
+        <h4 class="mb-0">Listado de productos</h4>
+        <button class="btn btn-secondary btn-sm" asp-action="AddProduct" asp-controller="Products">
+            <i class="fa-solid fa-plus"></i> Agregar nuevo producto
+        </button>
+    </div>
+
+    @* Product List *@
+    <section class="py-5">
+        <div class="container px-4 px-lg-5 mt-5">
+            <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+
+                @foreach (var product in Model)
+                {
+                    <div class="col mb-5">
+                        <div class="card h-100" style="border-radius: 5px;">
+                            <img class="card-img-top" src="@(product.UrlPictures.FirstOrDefault() ?? Url.Content("~/images/defaultimage.jpg"))" alt="@product.Name" style="border-radius: 5px;" />
+                            <div class="card-body p-4">
+                                <div class="text-center">
+                                    <h5 class="fw-bolder">@product.Name</h5>
+                                    @product.Price @product.Currency
+                                </div>
+                            </div>
+                            <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                                <div class="text-center"><a class="btn btn-outline-dark mt-auto" data-bs-toggle="modal" data-bs-target="#productModal-@product.SKU">Ver producto</a></div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            @* Paginator *@
+            <nav>
+                <ul class="pagination justify-content-center">
+                    <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                        <a class="page-link custom-paginator-link" href="@Url.Action("Index", new { Page = currentPage - 1, ProductsPerPage = productsPerPage })">
+                            <i class="fas fa-angle-left"></i> Anterior
+                        </a>
+                    </li>
+                    @for (int i = 1; i <= totalPages; i++)
+                    {
+                        <li class="page-item @(i == currentPage ? "active custom-paginator-active" : "")">
+                            <a class="page-link custom-paginator-link" href="@Url.Action("Index", new { Page = i, ProductsPerPage = productsPerPage })">@i</a>
+                        </li>
+                    }
+                    <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                        <a class="page-link custom-paginator-link" href="@Url.Action("Index", new { Page = currentPage + 1, ProductsPerPage = productsPerPage })">
+                            Siguiente <i class="fas fa-angle-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+
+        </div>
+    </section>
+</div>
