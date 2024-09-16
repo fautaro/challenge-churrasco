@@ -18,7 +18,7 @@
                                 @foreach (var picture in Model.UrlPictures)
                                 {
                                     <div class="carousel-item @(Model.UrlPictures.First() == picture ? "active" : "")">
-                                        <img src="@picture" class="d-block mx-auto w-50" alt="@Model.Name">
+                                        <img src="@Url.Content(picture)" class="d-block mx-auto w-50" alt="@Model.Name">
                                     </div>
                                 }
                             }

@@ -27,3 +27,19 @@
 
 @* Generic Modal -  Product details: Este div renderiza un modal con los detalles del producto *@
 <div id="modalContainer"></div>
+@{
+    var errorMessage = TempData["ErrorMessage"] as string;
+    var successMessage = TempData["SuccessMessage"] as string;
+}
+<script>
+    var errorMessage = '@errorMessage';
+    var successMessage = '@successMessage';
+    toastr.options = {"positionClass": "toast-bottom-right"};
+
+    if (typeof errorMessage !== 'undefined' && errorMessage != null && errorMessage != '') {
+        toastr.error(errorMessage)
+        }
+    if (typeof successMessage !== 'undefined' && successMessage != null && successMessage != '') {
+            toastr.success(successMessage)
+        }
+</script>
