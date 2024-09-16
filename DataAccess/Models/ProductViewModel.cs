@@ -1,5 +1,4 @@
-﻿using DataAccess.Models.ViewModels;
-
+﻿
 namespace DataAccess.Models
 {
     public class ProductViewModel
@@ -13,7 +12,7 @@ namespace DataAccess.Models
         public string Currency { get; set; }
 
         public List<string>? UrlPictures { get; set; }
+        public string? BaseFolderImages { get; set; }
 
-        public PictureListDTO? PictureList { get; set; }
     }
 }

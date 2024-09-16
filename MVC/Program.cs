@@ -1,12 +1,16 @@
+using AutoMapper;
 using DataAccess.Interfaces;
 using DataAccess.Persistence;
+using DataAccess.Profiles;
 using DataAccess.Repositories;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
 using MVC.Services;
 
+
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddAutoMapper(typeof(ProductProfile));
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetService<ApplicationDbContext>());
@@ -15,6 +19,11 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<LoginService>();
 builder.Services.AddScoped<ProductService>();
 builder.Services.AddTransient<CryptoService>();
+
+var mapperConfig = new MapperConfiguration(cfg =>
+{
+    cfg.AddProfile(new ProductProfile());
+});
 
 builder.Services.Configure<RazorViewEngineOptions>(options =>
 {

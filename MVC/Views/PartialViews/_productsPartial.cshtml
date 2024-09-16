@@ -7,7 +7,14 @@
     var totalPages = ViewBag.TotalPages ?? 1;
     var productsPerPage = ViewBag.ProductsPerPage ?? 4;
 }
+
 <div class="mb-2 mt-2">
+    <div class="mt-4 text-center">
+        <a id="btnAgregarProducto" asp-action="AddProduct" asp-controller="Products" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Agregar nuevo producto
+        </a>
+
+    </div>
     <section class="py-5">
         <div class="container px-4 px-lg-5 mt-5">
             <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">

@@ -1,8 +1,10 @@
-﻿using DataAccess.Interfaces;
+﻿using AutoMapper;
+using DataAccess.Interfaces;
 using DataAccess.Models;
-using DataAccess.Models.ViewModels;
+using Domain.Entities;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace MVC.Services
 {
@@ -11,11 +13,14 @@ namespace MVC.Services
     {
         private readonly IProductRepository _repository;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IMapper _mapper;
 
-        public ProductService(IProductRepository productRepository, IWebHostEnvironment webHostEnvironment)
+
+        public ProductService(IProductRepository productRepository, IWebHostEnvironment webHostEnvironment, IMapper mapper)
         {
             _repository = productRepository;
             _webHostEnvironment = webHostEnvironment;
+            _mapper = mapper;
         }
 
         #region Get Products List
@@ -25,21 +30,11 @@ namespace MVC.Services
             var TotalProducts = await GetQuantityTotalProductsAsync(cancellationToken);
             var ProductList = await _repository.GetProductsList(Page, ProductsPerPage, TotalProducts, cancellationToken);
 
-            List<ProductViewModel> result = new List<ProductViewModel>();
+            var result = _mapper.Map<List<ProductViewModel>>(ProductList);
 
-            foreach (var element in ProductList)
+            foreach (var item in result)
             {
-                ProductViewModel product = new ProductViewModel()
-                {
-                    Id = element.Id,
-                    SKU = element.SKU,
-                    Name = element.Name,
-                    Price = element.Price ?? 0,
-                    Currency = element.Currency,
-                    UrlPictures = GetImageUrls(element.Picture)
-                };
-
-                result.Add(product);
+                item.UrlPictures = GetImageUrls(item.BaseFolderImages);
             }
 
             return result;
@@ -55,16 +50,8 @@ namespace MVC.Services
         {
             var Product = await _repository.GetProductAsync(Id, cancellationToken);
 
-                ProductViewModel result = new ProductViewModel()
-                {
-                    Id = Product.Id,
-                    Description = Product.Description ?? "El producto no tiene descripción.",
-                    SKU = Product.SKU,
-                    Name = Product.Name,
-                    Price = Product.Price ?? 0,
-                    Currency = Product.Currency,
-                    UrlPictures = GetImageUrls(Product.Picture)
-                };
+            var result = _mapper.Map<ProductViewModel>(Product);
+            result.UrlPictures = GetImageUrls(result.BaseFolderImages);
 
             return result;
         }
@@ -99,38 +86,42 @@ namespace MVC.Services
 
         #region Add Products
 
-        public async Task AddProductAsync(ProductViewModel product, IFormFileCollection images, CancellationToken cancellationToken)
+        public async Task AddProductAsync(ProductViewModel request, IFormFileCollection images, CancellationToken cancellationToken)
         {
-            if (images != null && images.Count > 0)
-            {
-                product.PictureList = await TransformPicturesToArrayByte(images, cancellationToken);
-            }
+
+            if (images.Count > 0)
+                request.BaseFolderImages = await MoveImagesToServer(images, cancellationToken);
+
+            var product = _mapper.Map<Products>(request);
 
             await _repository.SaveProduct(product, cancellationToken);
         }
 
-        private async Task<PictureListDTO> TransformPicturesToArrayByte(IFormFileCollection images, CancellationToken cancellationToken)
+        public async Task<string> MoveImagesToServer(IFormFileCollection images, CancellationToken cancellationToken)
         {
-            var imageList = new List<PictureDTO>();
+            var BaseImageFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "products");
+            var GuidPicturesFolder = Guid.NewGuid().ToString();
+            var ImageFolder = Path.Combine(BaseImageFolder, GuidPicturesFolder);
+            var relativeUrl = $"~//images//products//{GuidPicturesFolder}";
 
-            using (var memoryStream = new MemoryStream())
+            if (!Directory.Exists(ImageFolder))
+                Directory.CreateDirectory(ImageFolder);
+
+            foreach (var image in images)
             {
-                foreach (var image in images)
+                if (image.Length > 0)
                 {
-                    if (image.Length > 0)
-                    {
-                        memoryStream.SetLength(0);
-                        await image.CopyToAsync(memoryStream, cancellationToken);
-                        var imageBytes = memoryStream.ToArray();
-                        var imageName = image.FileName;
+                    var filePath = Path.Combine(ImageFolder, $"{Guid.NewGuid()}{Path.GetExtension(image.FileName)}");
 
-                        imageList.Add(new PictureDTO(imageBytes, imageName));
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await image.CopyToAsync(fileStream, cancellationToken);
                     }
                 }
             }
-            return new PictureListDTO(imageList);
-        }
 
+            return relativeUrl;
+        }
         #endregion
     }
 }
