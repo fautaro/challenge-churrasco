@@ -73,14 +73,19 @@ namespace MVC.Services
         {
             List<string> imageUrls = new List<string>();
 
-            if (Directory.Exists(picturePath))
+            string wwwrootPath = _webHostEnvironment.WebRootPath;
+            string replaceRelativeSymbol = picturePath.TrimStart('~', '/');
+            string fullPath = Path.Combine(wwwrootPath, replaceRelativeSymbol);
+
+
+            if (Directory.Exists(fullPath))
             {
-                var imageFiles = Directory.GetFiles(picturePath, "*.*", SearchOption.TopDirectoryOnly);
+                var imageFiles = Directory.GetFiles(fullPath, "*.*", SearchOption.TopDirectoryOnly);
 
                 foreach (var file in imageFiles)
                 {
-                    string url = ConvertToUrl(file);
-                    imageUrls.Add(url);
+                    string fileName = Path.GetFileName(file);
+                    imageUrls.Add($"/{replaceRelativeSymbol}/{fileName}".Replace("//", "/"));
                 }
             }
             else if (Uri.IsWellFormedUriString(picturePath, UriKind.Absolute) && (picturePath.StartsWith("http://") || picturePath.StartsWith("https://")))
