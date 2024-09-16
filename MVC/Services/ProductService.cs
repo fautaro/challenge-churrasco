@@ -1,6 +1,7 @@
 ﻿using DataAccess.Interfaces;
 using DataAccess.Models;
 using DataAccess.Models.ViewModels;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 
 namespace MVC.Services
@@ -21,14 +22,9 @@ namespace MVC.Services
 
         public async Task<List<ProductViewModel>> GetProductsAsync(int Page, int ProductsPerPage, CancellationToken cancellationToken)
         {
-            var productList = await GetProductsPageSelected(Page, ProductsPerPage, cancellationToken);
-            return productList;
-        }
-
-        private async Task<List<ProductViewModel>> GetProductsPageSelected(int page, int ProductsPerPage, CancellationToken cancellationToken)
-        {
             var TotalProducts = await GetTotalProductsAsync(cancellationToken);
-            var ProductList = await _repository.GetProductsList(page, ProductsPerPage, TotalProducts, cancellationToken);
+            var ProductList = await _repository.GetProductsList(Page, ProductsPerPage, TotalProducts, cancellationToken);
+
             List<ProductViewModel> result = new List<ProductViewModel>();
 
             foreach (var element in ProductList)
@@ -66,6 +62,10 @@ namespace MVC.Services
                     string url = ConvertToUrl(file);
                     imageUrls.Add(url);
                 }
+            }
+            else if (Uri.IsWellFormedUriString(picturePath, UriKind.Absolute) && (picturePath.StartsWith("http://") || picturePath.StartsWith("https://")))
+            {
+                imageUrls.Add(picturePath);
             }
             return imageUrls;
         }

@@ -51,7 +51,6 @@ body {
     font-size:15px;
 }
 
-
 /*Pagination*/
 
 .custom-paginator-link, .btn-outline-dark:hover {
@@ -60,10 +59,10 @@ body {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-    .custom-paginator-link:hover {
-        background-color: #8b87e0;
-        color: white;
-    }
+.custom-paginator-link:hover {
+    background-color: #8b87e0;
+    color: white;
+}
 
 .page-item.active .custom-paginator-link {
     background-color: #282250;
@@ -71,8 +70,22 @@ body {
     border: none;
 }
 
+/*Card header product list*/
+.full-width-header {
+    background: #F4F4F4;
+}
+.titleProductsHeader {
+    color: #4F4F4F;
+}
+
+.subtitleProductsHeader {
+    color: #7D7D7D;
+}
 
 /*Card product*/
+.cardProduct {
+    border-radius: 5px;
+}
 
 .btn-outline-dark:hover {
     text-decoration: none;
@@ -80,3 +93,11 @@ body {
     color: white;
     transition: background-color 0.3s ease, color 0.3s ease;
 }
+
+.img-cover {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 5px 5px 0 0;
+}
+
