@@ -95,13 +95,6 @@ namespace MVC.Services
             return imageUrls;
         }
 
-        private string ConvertToUrl(string filePath)
-        {
-            string baseUrl = $"{_webHostEnvironment.WebRootPath}/images/products";
-            string fileName = Path.GetFileName(filePath);
-            return $"{baseUrl}{fileName}";
-        }
-
         #endregion
 
         #region Add Products
