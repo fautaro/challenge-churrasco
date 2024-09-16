@@ -1,0 +1,121 @@
+﻿@using DataAccess.Models
+@model ProductViewModel
+<title>Alta de producto - Churrasco</title>
+
+<div class="py-4 full-width-header">
+    <div class="px-4 px-lg-5 my-5">
+        <div class="text-center">
+            <h1 class="display-4 fw-bolder titleProductsHeader" style="font-size:40px">Agregar nuevo producto</h1>
+        </div>
+    </div>
+</div>
+<div class="container mt-5">
+    <form asp-action="AddProduct" enctype="multipart/form-data" method="post" id="productForm">
+        <div class="row">
+            <div class="col-md-6">
+                <!-- SKU -->
+                <div class="mb-3">
+                    <label for="SKU" class="form-label">SKU</label>
+                    <input type="number" asp-for="SKU" class="form-control" placeholder="Ingrese el SKU" min="0" id="SKU" required/>
+                    <span id="SKU-error" class="text-danger" style="display:none">El campo debe tener 11 caracteres como máximo</span>
+
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <!-- Código -->
+                <div class="mb-3">
+                    <label for="Code" class="form-label">Código</label>
+                    <input type="number" asp-for="Code" class="form-control" placeholder="Ingrese el código del producto" min="0" id="Code" required />
+                    <span id="Code-error" class="text-danger" style="display:none">El campo debe tener 11 caracteres como máximo</span>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <!-- Nombre -->
+                <div class="mb-3">
+                    <label for="Name" class="form-label">Nombre</label>
+                    <input type="text" asp-for="Name" class="form-control" placeholder="Ingrese el nombre del producto" maxlength="40" required/>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <!-- Descripción -->
+                <div class="mb-3">
+                    <label for="Description" class="form-label">Descripción</label>
+                    <textarea asp-for="Description" class="form-control" rows="3" placeholder="Ingrese la descripción del producto" required maxlength="255"></textarea>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <!-- Precio -->
+                <div class="mb-3">
+                    <label for="Price" class="form-label">Precio</label>
+                    <input type="number" step="0.01" asp-for="Price" class="form-control" placeholder="Ingrese el precio" required />
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <!-- Moneda -->
+                <div class="mb-3">
+                    <label for="Currency" class="form-label">Moneda</label>
+                    <select asp-for="Currency" class="form-control" required>
+                        <option value="">Seleccione una moneda</option>
+                        <option value="USD">USD</option>
+                        <option value="EUR">EUR</option>
+                        <option value="ARS">ARS</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-md-12">
+                <!-- Imgs -->
+                <div class="mb-3">
+                    <label for="Images" class="form-label">Imágenes del Producto</label>
+                    <input type="file" name="images" class="form-control" accept="image/*" multiple id="Images" />
+                    <span id="Images-error" class="text-danger" style="display:none">Debe ingresar alguna imagen</span>
+                </div>
+
+            </div>
+        </div>
+        <!-- Submit -->
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Guardar nuevo producto
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#productForm').on('submit', function (event) {
+            var images = $('#Images')[0].files;
+            var sku = $('#SKU').val();
+            var code = $('#Code').val();
+
+            if (images.length == 0){
+                event.preventDefault();
+                $('#Images-error').show();
+            } else {
+                $('#Images-error').hide();
+
+            }
+            if (sku.length > 11) {
+                event.preventDefault();
+                $('#SKU-error').show();
+            } else {
+                $('#SKU-error').hide();
+
+            }
+
+            if (sku.length > 11) {
+                event.preventDefault();
+                $('#Code-error').show();
+            } else {
+                $('#SKU-error').hide();
+            }
+
+        });
+    });
+</script>
