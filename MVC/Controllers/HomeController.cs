@@ -21,7 +21,6 @@ namespace Churrasco.Controllers
 
         public IActionResult Index()
         {
-            //Todo: Corregir para que sea general
             if (User.Identity.IsAuthenticated)
                 return RedirectToAction("Index", "Products");
 
