@@ -3,10 +3,7 @@
 @model IEnumerable<ProductViewModel>
 <title>Churrasco - Productos</title>
 
-
-
 @* Header *@
-
 <div class="py-5 full-width-header">
     <div class="px-4 px-lg-5 my-5">
         <div class="text-center">
@@ -14,6 +11,13 @@
             <p class="lead fw-normal mb-0 subtitleProductsHeader">¡Bienvenido a nuestra tienda online! Disfruta de todo nuestro catálogo vigente.</p>
         </div>
     </div>
+</div>
+
+<div class="mt-4 text-center">
+    <a id="btnAgregarProducto" asp-action="AddProduct" asp-controller="Products" class="btn btn-dark">
+        <i class="fas fa-plus"></i> Agregar nuevo producto
+    </a>
+
 </div>
 @* Product List *@
 @{
