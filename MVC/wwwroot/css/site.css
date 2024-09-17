@@ -68,15 +68,15 @@ html {
 
 /*Card header product list*/
 .full-width-header {
-    background: #F4F4F4;
+    background: #E0E5EC;
 }
 
 .titleProductsHeader {
-    color: #4F4F4F;
+    color: #333333;
 }
 
 .subtitleProductsHeader {
-    color: #7D7D7D;
+    color: #5A5A5A;
 }
 
 /*Card product*/
